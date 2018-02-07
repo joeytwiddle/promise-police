@@ -91,7 +91,8 @@ You could also potentially add this behaviour to other promise libraries (e.g. `
 
 # Caveats
 
-- If you are using mongoose, and you create a query but forget to handle it, promise-police will not detect it.  That's because mongoose queries do not turn into promises until you either `.exec()` or `.then(0` them.
+- If you are using mongoose, and you create a query but forget to handle it, promise-police will not detect it.  That's because mongoose queries do not turn into promises until you either `.exec()` or `.then()` them.
+- Not working properly in React Native.  The information that gets logged is not very helpful.  (We probably need to use source maps.  And it seems we will need to log the error message independently, because it's not appearing in the stack like it does in other environments.)
 
 # Todo
 
@@ -99,6 +100,7 @@ You could also potentially add this behaviour to other promise libraries (e.g. `
 - Option to throw an error rather than just log a warning?
 - Allow event handler to be registered instead of throwing an error or logging a warning?
 - Provide the same functionality for Q and Bluebird users?
+- Support React Native.  Test some other environments too.
 - Police more constraints, such as those in Soares's post?  (I haven't experienced a need for most of them, but YMMV!)  One constraint I might like: Complain if Promises are rejected without an Error object.
 - We could make the regexp blacklist checking more efficient, but that is probably overkill for a simple development tool.
 
