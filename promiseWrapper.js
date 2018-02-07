@@ -27,6 +27,9 @@ module.exports = {
       return promise
     }
 
+    // Needed to get Promise.resolve and Promise.all
+    Object.assign(NewPromiseConstructor, OriginalPromiseConstructor)
+
     // Not strictly needed, because we don't use this prototype to build new promises, but doing this might look more correct to nosy outsiders
     // NewPromiseConstructor.prototype = OriginalPromiseConstructor.prototype
 
