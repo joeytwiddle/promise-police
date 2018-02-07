@@ -74,10 +74,10 @@ promiseWrapper.wrap(global, 'Promise', {
   // Some libraries do not always handle the promises they create.
   // If you receive warnings that you want to mute, you can add a regexp that will match only that code's stacktrace.
   //
-  ignoreList: [
+  ignoreList: promiseWrapper.defaultOptions.ignoreList.concat([
     / at Mongoose.connect /,
     / at Mongoose.model /
-  ],
+  ]),
 
   // If set to false, only the first promise created is checked.  Promises resulting from later .then()s are not checked.
   //

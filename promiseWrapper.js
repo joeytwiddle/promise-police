@@ -24,6 +24,8 @@ const defaultOptions = {
 }
 
 module.exports = {
+  defaultOptions: defaultOptions,
+
   wrap: (obj, prop, options) => {
     options = Object.assign({}, defaultOptions, options)
 
