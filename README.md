@@ -22,7 +22,7 @@ We only load the module in development mode, so our production app can create lo
 
 # See it in action
 
-Examples of valid code:
+If you write code like this, nothing will change:
 
 ```js
 createPromise().then(handleSuccess).catch(handleError)
@@ -31,10 +31,12 @@ createPromise().then(handleSuccess, handleError)
 
 createPromise().catch(handleError)
 
+await createPromise()
+
 return createPromise()
 ```
 
-Examples of invalid code:
+But code like this will alert the promise-police:
 
 ```js
 // You forgot to catch
@@ -44,14 +46,16 @@ createPromise().then(handleSuccess)
 createPromise()
 ```
 
-If you create a promise and you don't add any handlers within the timeout period, a warning will be logged:
+Specifically, if you create a promise and you don't add any handlers within the timeout period, a warning will be logged:
 
 ```
-Error: Unhandled promise detected by promise-police: Promise has not been .then()-ed or .catch()-ed!
+Unhandled promise detected by promise-police: Error: Promise has not been .then()-ed or .catch()-ed!
     at createPromise (test.js:24:11)
     at main (test.js:12:4)
     at ...
 ```
+
+By looking down the stack-trace, you should be able to find the line of code where you forgot to handle the promise.
 
 Note that in the case of a promise chain, the stacktrace will only indicate the last `.then()` in the chain, not the start of the chain.  For more informative stacktraces, you may want to enable long stacktrace support: [node](https://github.com/mattinsler/longjohn), [ES6 Promise](https://gist.github.com/joeytwiddle/8c357b8a4ac6803a0f188d495901b6bc), [bluebird](http://bluebirdjs.com/docs/api/promise.longstacktraces.html), [Q](https://stackoverflow.com/a/24046877)
 
@@ -61,15 +65,19 @@ By default, this module replaces the global `Promise` constructor with our own c
 
 # Configuration
 
+Instead of the basic uage above, you can configure the module to behave differently.
+
 In environments where the logged stacktrace is not helpful (such as Expo with CRNA), you can throw an error instead of logging:
 
 ```js
 require('promise-police/configure')({ throwError: true });
 ```
 
+This will produce more useful output, because a thrown error will have its stack passed through the source map.
+
 # Advanced configuration
 
-Or you can perform a more detailed configuration:
+Or you can perform a fully detailed configuration:
 
 ```js
 const promiseWrapper = require('promise-police/promiseWrapper')
@@ -108,6 +116,8 @@ You could also potentially add this behaviour to other promise libraries (e.g. `
 
 # Caveats
 
+- A lot of libraries do not follow the Golden Rule: they skip doing `.catch()` because they are certain that the promise will resolve.  promise-police will detect and report these violations until a suitable regexp is added to the `ignoreList`.  This is a pain!  We only really want to catch violations of the Golden Rule within our app.
+  We could add `/node_modules/` as an ignore regexp.  That would work, but it would also avoid checking many promises that we want to check: promises created inside a package but returned to the app for handling, or promises created inside app code but on a stack that was initiated from inside a package.
 - If you are using mongoose, and you create a query but forget to handle it, promise-police will not detect it.  That's because mongoose queries do not turn into promises until you either `.exec()` or `.then()` them.
 - Not working properly in React Native.  The information that gets logged is not very helpful.  We probably need to use source maps for this.
 
@@ -115,9 +125,9 @@ You could also potentially add this behaviour to other promise libraries (e.g. `
 
 - Add tests.
 - Allow event handler to be registered instead of throwing an error or logging a warning?
-- Provide the same functionality for Q and Bluebird users?
-- Support React Native.  Test some other environments too.
-- Police more constraints, such as those in Soares's post?  (I haven't experienced a need for most of them, but YMMV!)  One constraint I might like: Complain if Promises are rejected without an Error object.
+- Provide the same functionality for Q and Bluebird users?  (Refactor so we can do `Q = wrap(require('q'))`.)
+- Test more environments.  (React Native, WebPack, ...)
+- Police more constraints, such as those in Soares's post?  (I haven't experienced a need for most of them, but YMMV!)  One other constraint I would like: Complain if Promises are rejected without an Error object.
 - We could make the regexp blacklist checking more efficient, but that is probably overkill for a simple development tool.
 
 # See also
