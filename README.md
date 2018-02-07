@@ -93,8 +93,11 @@ You could also potentially add this behaviour to other promise libraries (e.g. `
 
 # Todo
 
+- Add tests.
 - Option to throw an error rather than just log a warning?
+- Allow event handler to be registered instead of throwing an error or logging a warning?
 - Provide the same functionality for Q and Bluebird users?
+- Police more constraints, such as those in Soares's post?  (I haven't experienced a need for most of them, but YMMV!)
 
 # See also
 
