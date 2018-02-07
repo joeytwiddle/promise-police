@@ -92,7 +92,7 @@ You could also potentially add this behaviour to other promise libraries (e.g. `
 # Caveats
 
 - If you are using mongoose, and you create a query but forget to handle it, promise-police will not detect it.  That's because mongoose queries do not turn into promises until you either `.exec()` or `.then()` them.
-- Not working properly in React Native.  The information that gets logged is not very helpful.  (We probably need to use source maps.  And it seems we will need to log the error message independently, because it's not appearing in the stack like it does in other environments.)
+- Not working properly in React Native.  The information that gets logged is not very helpful.  We probably need to use source maps for this.
 
 # Todo
 

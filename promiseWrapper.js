@@ -38,7 +38,7 @@ module.exports = {
 }
 
 function addCheckingToPromise (promise, options) {
-  const stackWhenCalled = new Error('Unhandled promise detected by promise-police: promise has not been .then()-ed or .catch()-ed!').stack
+  const stackWhenCalled = new Error('promise has not been .then()-ed or .catch()-ed!').stack
 
   const ignore = options.ignoreList.some(regexp => stackWhenCalled.match(regexp))
   if (ignore) {
@@ -73,7 +73,7 @@ function addCheckingToPromise (promise, options) {
   setTimeout(() => {
     if (!hasBeenHandled) {
       const tidyStack = stackWhenCalled.split('\n').filter(line => !line.match(/\/promiseWrapper\.js:/)).join('\n')
-      console.warn(tidyStack)
+      console.warn('Unhandled promise detected by promise-police:', tidyStack)
     }
   }, options.timeout)
 
