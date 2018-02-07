@@ -18,6 +18,8 @@ if ((process.env.NODE_ENV || 'development') === 'development') {
 }
 ```
 
+We only load the module in development mode, so our production app can create lots of promises with no additional overhead.
+
 # See it in action
 
 Examples of valid code:
@@ -97,7 +99,8 @@ You could also potentially add this behaviour to other promise libraries (e.g. `
 - Option to throw an error rather than just log a warning?
 - Allow event handler to be registered instead of throwing an error or logging a warning?
 - Provide the same functionality for Q and Bluebird users?
-- Police more constraints, such as those in Soares's post?  (I haven't experienced a need for most of them, but YMMV!)
+- Police more constraints, such as those in Soares's post?  (I haven't experienced a need for most of them, but YMMV!)  One constraint I might like: Complain if Promises are rejected without an Error object.
+- We could make the regexp blacklist checking more efficient, but that is probably overkill for a simple development tool.
 
 # See also
 
