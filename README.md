@@ -8,8 +8,6 @@ It enforces "The Golden Rule of Promises":
 
 _**Every promise must either be caught, or returned.**_
 
-_(Note: In the case of returning a promise, the Golden Rule is applied recursively: The caller should itself either catch or return the promise it received.)_
-
 # How to use it
 
 Basic usage:
