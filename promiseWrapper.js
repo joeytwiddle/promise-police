@@ -3,7 +3,11 @@ const defaultOptions = {
 
   ignoreList: [
     / at Mongoose.connect /,
-    / at Mongoose.model /
+    / at Mongoose.model /,
+    // For React-Native (CRNA with Expo)
+    /workLoop/,
+    /fetchSVGData/,
+    /createNavigationContainer/
   ],
 
   // If set to false, only the first promise created is checked.  Promises resulting from later .then()s are not checked.
