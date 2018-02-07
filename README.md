@@ -68,22 +68,31 @@ const promiseWrapper = require('promise-police/promiseWrapper')
 
 promiseWrapper.wrap(global, 'Promise', {
   // How long to wait for a .then() or .catch() to be added to the promise.
+  //
   //timeout: 2000,
 
   // Some libraries do not always handle the promises they create.
   // If you receive warnings that you want to mute, you can add a regexp that will match only that code's stacktrace.
+  //
   ignoreList: [
     / at Mongoose.connect /,
     / at Mongoose.model /
   ],
 
   // If set to false, only the first promise created is checked.  Promises resulting from later .then()s are not checked.
+  //
   //checkChains: true,
 
   // Set this true to consider a chain has been sufficiently handled after `.then(good, bad)`
   // Set this false to consider a chain only sufficiently handled after `.then(good).catch(bad)`
   // (Probably not a good idea to set it false: Many libraries in the wild use the former approach.)
-  //twoFunctionsCompleteChain: true
+  //
+  //twoFunctionsCompleteChain: true,
+
+  // Instead of logging, throw an error when an unhandled promise is detected
+  // This is good when using create-react-native-app, because the stack will display properly
+  //
+  //throwError: false
 })
 ```
 
@@ -97,7 +106,6 @@ You could also potentially add this behaviour to other promise libraries (e.g. `
 # Todo
 
 - Add tests.
-- Option to throw an error rather than just log a warning?
 - Allow event handler to be registered instead of throwing an error or logging a warning?
 - Provide the same functionality for Q and Bluebird users?
 - Support React Native.  Test some other environments too.

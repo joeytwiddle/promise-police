@@ -16,7 +16,11 @@ const defaultOptions = {
   // Set this true to consider a chain has been sufficiently handled after `.then(good, bad)`
   // Set this false to consider a chain only sufficiently handled after `.then(good).catch(bad)`
   // (Probably not a good idea to set it false: Many libraries in the wild use the former approach.)
-  twoFunctionsCompleteChain: true
+  twoFunctionsCompleteChain: true,
+
+  // Instead of logging, throw an error when an unhandled promise is detected
+  // This is good when using create-react-native-app, because the stack will display properly
+  throwError: false
 }
 
 module.exports = {
@@ -42,9 +46,9 @@ module.exports = {
 }
 
 function addCheckingToPromise (promise, options) {
-  const stackWhenCalled = new Error('promise has not been .then()-ed or .catch()-ed!').stack
+  const errorWhenCalled = new Error('promise has not been .then()-ed or .catch()-ed!')
 
-  const ignore = options.ignoreList.some(regexp => stackWhenCalled.match(regexp))
+  const ignore = options.ignoreList.some(regexp => errorWhenCalled.stack.match(regexp))
   if (ignore) {
     return promise
   }
@@ -76,8 +80,12 @@ function addCheckingToPromise (promise, options) {
 
   setTimeout(() => {
     if (!hasBeenHandled) {
-      const tidyStack = stackWhenCalled.split('\n').filter(line => !line.match(/\/promiseWrapper\.js:/)).join('\n')
-      console.warn('Unhandled promise detected by promise-police:', tidyStack)
+      if (options.throwError) {
+        throw errorWhenCalled
+      } else {
+        const tidyStack = errorWhenCalled.stack.split('\n').filter(line => !line.match(/\/promiseWrapper\.js:/)).join('\n')
+        console.warn('Unhandled promise detected by promise-police:', tidyStack)
+      }
     }
   }, options.timeout)
 
