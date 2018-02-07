@@ -53,15 +53,23 @@ Error: Unhandled promise detected by promise-police: Promise has not been .then(
     at ...
 ```
 
-Note that in the case of a promise chain, the stack trace will only indicate the last `.then()` in the chain, not the start of the chain.  For more informative stack traces, you may want to enable long stacktrace support: [node](https://github.com/mattinsler/longjohn), [ES6 Promise](https://gist.github.com/joeytwiddle/8c357b8a4ac6803a0f188d495901b6bc), [bluebird](http://bluebirdjs.com/docs/api/promise.longstacktraces.html), [Q](https://stackoverflow.com/a/24046877)
+Note that in the case of a promise chain, the stacktrace will only indicate the last `.then()` in the chain, not the start of the chain.  For more informative stacktraces, you may want to enable long stacktrace support: [node](https://github.com/mattinsler/longjohn), [ES6 Promise](https://gist.github.com/joeytwiddle/8c357b8a4ac6803a0f188d495901b6bc), [bluebird](http://bluebirdjs.com/docs/api/promise.longstacktraces.html), [Q](https://stackoverflow.com/a/24046877)
 
 # How it works
 
 By default, this module replaces the global `Promise` constructor with our own constructor which always calls the original `Promise` constructor, but also adds some magic to the newly created promise.
 
-# Advanced usage
+# Configuration
 
-You can override the default options by providing your own values.
+In environments where the logged stacktrace is not helpful (such as Expo with CRNA), you can throw an error instead of logging:
+
+```js
+require('promise-police/configure')({ throwError: true });
+```
+
+# Advanced configuration
+
+Or you can perform a more detailed configuration:
 
 ```js
 const promiseWrapper = require('promise-police/promiseWrapper')
