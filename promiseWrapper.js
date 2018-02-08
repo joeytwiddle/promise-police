@@ -47,7 +47,7 @@ module.exports = {
   }
 }
 
-function addCheckingToPromise (promise, options) {
+function addCheckingToPromise (promise, options, alreadyHandled) {
   const errorWhenCalled = new Error('promise has not been .then()-ed or .catch()-ed!')
 
   const ignore = options.ignoreList.some(regexp => errorWhenCalled.stack.match(regexp))
@@ -58,7 +58,7 @@ function addCheckingToPromise (promise, options) {
   const originalThen = promise.then
   const originalCatch = promise.catch
 
-  let hasBeenHandled = false
+  let hasBeenHandled = !!alreadyHandled
 
   promise.then = function () {
     hasBeenHandled = true
@@ -77,10 +77,13 @@ function addCheckingToPromise (promise, options) {
 
   promise.catch = function () {
     hasBeenHandled = true
-    return originalCatch.apply(this, arguments)
+    const nextPromiseInChain = originalCatch.apply(this, arguments)
+    // We don't actually need to check this promise.  But we still want to wrap it, in case it is .then()-ed.  In that case, we will want to check those later promises in the chain.
+    addCheckingToPromise(nextPromiseInChain, options, true)
+    return nextPromiseInChain
   }
 
-  setTimeout(() => {
+  hasBeenHandled || setTimeout(() => {
     if (!hasBeenHandled) {
       if (options.throwError) {
         throw errorWhenCalled
@@ -91,7 +94,8 @@ function addCheckingToPromise (promise, options) {
     }
   }, options.timeout)
 
-  promise._underPoliceObservation = true
+  // For debugging
+  // promise._underPoliceObservation = true
 
   return promise
 }
