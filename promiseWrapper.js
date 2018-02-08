@@ -4,6 +4,8 @@ const defaultOptions = {
   ignoreList: [
     / at Mongoose.connect /,
     / at Mongoose.model /,
+    // For Bluebird
+    /Object.getNativePromise .*[/]bluebird[/]js[/]release[/]util.js/,
     // For React-Native (CRNA with Expo)
     /workLoop/,
     /fetchSVGData/,
