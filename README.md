@@ -10,10 +10,10 @@ _**Every promise must either be caught, or returned.**_
 
 # How to use it
 
-Basic usage:
+Basic usage, only in development:
 
 ```js
-if ((process.env.NODE_ENV || 'development') === 'development') {
+if (!process.env.NODE_ENV) {
   require('promise-police')
 }
 ```
