@@ -8,7 +8,7 @@ This is especially useful for developers who are just starting to learn promises
 
 It enforces "The Golden Rule of Promises":
 
-_**Every promise must either be caught, or returned.**_
+_**Every promise must either be awaited, or returned, or caught.**_
 
 ## How to use it
 
