@@ -1,4 +1,6 @@
-# What it does
+# promise-police
+
+## What it does
 
 promise-police is a debugging tool that detects promises in your application which you have forgotten to handle.
 
@@ -8,7 +10,7 @@ It enforces "The Golden Rule of Promises":
 
 _**Every promise must either be caught, or returned.**_
 
-# How to use it
+## How to use it
 
 Basic usage, only in development:
 
@@ -20,7 +22,7 @@ if (!process.env.NODE_ENV) {
 
 We only load the module in development mode, so our production app can create lots of promises with no additional overhead.
 
-# See it in action
+## See it in action
 
 If you write code like this, nothing will change:
 
@@ -59,11 +61,11 @@ By looking down the stack-trace, you should be able to find the line of code whe
 
 Note that in the case of a promise chain, the stacktrace will only indicate the last `.then()` in the chain, not the start of the chain.  For more informative stacktraces, you may want to enable long stacktrace support: [node](https://github.com/mattinsler/longjohn), [ES6 Promise](https://gist.github.com/joeytwiddle/8c357b8a4ac6803a0f188d495901b6bc), [bluebird](http://bluebirdjs.com/docs/api/promise.longstacktraces.html), [Q](https://stackoverflow.com/a/24046877)
 
-# How it works
+## How it works
 
 By default, this module replaces the global `Promise` constructor with our own constructor which always calls the original `Promise` constructor, but also adds some magic to the newly created promise.
 
-# Configuration
+## Configuration
 
 Instead of the basic uage above, you can configure the module to behave differently.
 
@@ -75,7 +77,7 @@ require('promise-police/configure')({ throwError: true });
 
 This will produce more useful output, because a thrown error will have its stack passed through the source map.
 
-# Advanced configuration
+## Advanced configuration
 
 Or you can perform a fully detailed configuration:
 
@@ -114,14 +116,14 @@ promiseWrapper.wrap(global, 'Promise', {
 
 You could also potentially add this behaviour to other promise libraries (e.g. `bluebird` or `Q`), but that feature is not yet well supported.
 
-# Caveats
+## Caveats
 
 - A lot of **libraries** do not follow the Golden Rule: they skip doing `.catch()` because they are certain that the promise will resolve.  **promise-police will detect and report these violations until a suitable regexp is added to the `ignoreList`.**  This is a pain!  We only really want to catch violations of the Golden Rule within our app.
   We could add `/node_modules/` as an ignore regexp.  That would work, but it would also avoid checking many promises that we want to check: promises created inside a package but returned to the app for handling, or promises created inside app code but on a stack that was initiated from inside a package.
 - If you are using mongoose, and you create a query but forget to handle it, promise-police will not detect it.  That's because mongoose queries do not turn into promises until you either `.exec()` or `.then()` them.
 - Not working properly in React Native.  The information that gets logged is not very helpful.  We probably need to use source maps for this.
 
-# Todo
+## Todo
 
 - Add tests.
 - Allow event handler to be registered instead of throwing an error or logging a warning?
@@ -130,7 +132,7 @@ You could also potentially add this behaviour to other promise libraries (e.g. `
 - Police more constraints, such as those in Soares's post?  (I haven't experienced a need for most of them, but YMMV!)  One other constraint I would like: Complain if Promises are rejected without an Error object.
 - We could make the regexp blacklist checking more efficient, but that is probably overkill for a simple development tool.
 
-# See also
+## See also
 
 - Inspiration for this utility came from reading [this post](https://github.com/soareschen/es6-promise-debugging/blob/master/README.md) about promise debugging by Soares Chen.
 
