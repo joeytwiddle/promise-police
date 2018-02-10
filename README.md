@@ -59,7 +59,7 @@ Unhandled promise detected by promise-police: Error: Promise has not been .then(
     at ...
 ```
 
-By looking down the stack-trace, you should be able to find the line of code where you forgot to handle the promise.
+By looking down the stacktrace, you should be able to find the line of code where you forgot to handle the promise.
 
 Note that in the case of a promise chain, the stacktrace will only indicate the last `.then()` in the chain, not the start of the chain.  For more informative stacktraces, you may want to enable long stacktrace support: [node](https://github.com/mattinsler/longjohn), [ES6 Promise](https://gist.github.com/joeytwiddle/8c357b8a4ac6803a0f188d495901b6bc), [bluebird](http://bluebirdjs.com/docs/api/promise.longstacktraces.html), [Q](https://stackoverflow.com/a/24046877)
 
@@ -126,7 +126,7 @@ You could also potentially add this behaviour to other promise libraries (e.g. `
 
 - If you are using mongoose, and you create a query but forget to handle it, promise-police will not detect it.  That's because mongoose queries do not turn into promises until you either `.exec()` or `.then()` them.
 
-- Not working properly in React Native.  The information that gets logged is not very helpful.  We probably need to use source maps for this.
+- When using React Native / Expo, the out-of-the-box behaviour is not helpful.  Violations are logged, but the lines in the stacktrace do not correspond to the original source code.  We probably need to use source maps for this.  However, you can get useful stacktraces by [throwing an error](#configuration) instead of logging.
 
 ## Todo
 
