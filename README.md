@@ -1,5 +1,7 @@
 # promise-police
 
+In alpha.  Please see the [Caveats](#caveats).
+
 ## What it does
 
 promise-police is a debugging tool that detects promises in your application which you have forgotten to handle.
@@ -119,8 +121,11 @@ You could also potentially add this behaviour to other promise libraries (e.g. `
 ## Caveats
 
 - A lot of **libraries** do not follow the Golden Rule: they skip doing `.catch()` because they are certain that the promise will resolve.  **promise-police will detect and report these violations until a suitable regexp is added to the `ignoreList`.**  This is a pain!  We only really want to catch violations of the Golden Rule within our app.
+
   We could add `/node_modules/` as an ignore regexp.  That would work, but it would also avoid checking many promises that we want to check: promises created inside a package but returned to the app for handling, or promises created inside app code but on a stack that was initiated from inside a package.
+
 - If you are using mongoose, and you create a query but forget to handle it, promise-police will not detect it.  That's because mongoose queries do not turn into promises until you either `.exec()` or `.then()` them.
+
 - Not working properly in React Native.  The information that gets logged is not very helpful.  We probably need to use source maps for this.
 
 ## Todo
