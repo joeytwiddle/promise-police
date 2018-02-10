@@ -1,6 +1,6 @@
 {
   "name": "promise-police",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "Warn the developer if a promise has been left unhandled",
   "main": "index.js",
   "repository": "https://github.com/joeytwiddle/promise-police",
