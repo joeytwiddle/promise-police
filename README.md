@@ -88,31 +88,32 @@ const promiseWrapper = require('promise-police/promiseWrapper')
 
 promiseWrapper.wrap(global, 'Promise', {
   // How long to wait for a .then() or .catch() to be added to the promise.
-  //
-  //timeout: 2000,
+
+  timeout: 2000,
 
   // Some libraries do not always handle the promises they create.
   // If you receive warnings that you want to mute, you can add a regexp that will match only that code's stacktrace.
-  //
+
   ignoreList: promiseWrapper.defaultOptions.ignoreList.concat([
     / at Mongoose.connect /,
     / at Mongoose.model /
   ]),
 
   // If set to false, only the first promise created is checked.  Promises resulting from later .then()s are not checked.
-  //
-  //checkChains: true,
 
-  // Set this true to consider a chain has been sufficiently handled after `.then(good, bad)`
-  // Set this false to consider a chain only sufficiently handled after `.then(good).catch(bad)`
-  // (Probably not a good idea to set it false: Many libraries in the wild use the former approach.)
-  //
-  //twoFunctionsCompleteChain: true,
+  checkChains: true,
+
+  // Set this true to consider a chain has been sufficiently handled after `.then(onWin, onFail)`
+  // Leave this false to consider a chain only sufficiently handled after `.then(onWin).catch(onFail)`
+  // (Many libraries use the former approach, so the default is currently true, but
+  // false is stricter, and therefore preferred when applying purely to app code.)
+
+  twoFunctionsCompleteChain: true,
 
   // Instead of logging, throw an error when an unhandled promise is detected
   // This is good when using create-react-native-app, because the stack will display properly
-  //
-  //throwError: false
+
+  throwError: true,
 })
 ```
 
@@ -120,19 +121,25 @@ You could also potentially add this behaviour to other promise libraries (e.g. `
 
 ## Caveats
 
-- A lot of **libraries** do not follow the Golden Rule: they skip doing `.catch()` because they are certain that the promise will resolve.  **promise-police will detect and report these violations until a suitable regexp is added to the `ignoreList`.**  This is a pain!  We only really want to catch violations of the Golden Rule within our app.
+- A lot of **libraries** do not follow the Golden Rule: they skip doing `.catch()` because they are confident that the promise will resolve.  Unfortunately, promise-police cannot tell the difference between violations of the Golden Rule in libraries, and violations in your app.
 
-  We could add `/node_modules/` as an ignore regexp.  That would work, but it would also avoid checking many promises that we want to check: promises created inside a package but returned to the app for handling, or promises created inside app code but on a stack that was initiated from inside a package.
+  **promise-police will detect and report violations inside libraries until a suitable regexp is added to the `ignoreList`.**  This is a pain when using lots of libraries.
 
-- If you are using mongoose, and you create a query but forget to handle it, promise-police will not detect it.  That's because mongoose queries do not turn into promises until you either `.exec()` or `.then()` them.
+  We could add `/node_modules/` as an ignore regexp.  That would work, but it would also avoid checking many promises that we want to check: promises created inside a package but returned to the app for handling, or promises created inside app code but on a stack that was initiated from inside a package.  (The second case might be detectable because there will be nore `/node_modules/` at the top of the stack.  But in the first case, promise-police doesn't know whether the promise is returned to your app code or if it only existed inside the library.)
 
-- When using React Native / Expo, the out-of-the-box behaviour is not helpful.  Violations are logged, but the lines in the stacktrace do not correspond to the original source code.  We probably need to use source maps for this.  However, you can get useful stacktraces by [throwing an error](#configuration) instead of logging.
+  Todo: One way to mitigate this might be to offer the developer an interactive prompt: "Ignore this violation in future?"
+
+- When running minified or transpiled code (for example, React Native with Expo), when a violation is reported the lines in the logged stacktrace are unhelpful, because they have not yet been passed through the source maps.  In those cases, you can probably get a more useful stacktrace by [throwing an error](#configuration) instead of logging.
+
+  Todo: We could also try using one of these projects to pass the stack lines through the sourcemap at runtime: [sourcemapped-stacktrace](https://github.com/novocaine/sourcemapped-stacktrace), [mapstrace](https://github.com/janekp/mapstrace).
+
+- If you are using mongoose, and you create a query but forget to handle it, promise-police will not detect that.  That's because mongoose queries do not turn into promises until you either `.exec()` or `.then()` them.  In this case, the query won't even be executed.  (To catch that, we would need to monkey-patch mongoose queries, to detect when a query is build but never executed.)
 
 ## Todo
 
 - Add tests.
 - Allow event handler to be registered instead of throwing an error or logging a warning?
-- Provide the same functionality for Q and Bluebird users?  (Refactor so we can do `Q = wrap(require('q'))`.)
+- Provide the same functionality for Q and Bluebird users?  (Refactor so we can do `Q = wrap(require('q'))`)
 - Test more environments.  (React Native, WebPack, ...)
 - Police more constraints, such as those in Soares's post?  (I haven't experienced a need for most of them, but YMMV!)  One other constraint I would like: Complain if Promises are rejected without an Error object.
 - We could make the regexp blacklist checking more efficient, but that is probably overkill for a simple development tool.
