@@ -148,3 +148,6 @@ You could also potentially add this behaviour to other promise libraries (e.g. `
 
 - Inspiration for this utility came from reading [this post](https://github.com/soareschen/es6-promise-debugging/blob/master/README.md) about promise debugging by Soares Chen.
 
+- An earlier experiment I made with promises can be found in this gist: [Long Stack Support for ES6 Promises](https://gist.github.com/joeytwiddle/8c357b8a4ac6803a0f188d495901b6bc)
+
+- Something smiilar, but probably better: https://www.npmjs.com/package/trace-unhandled
